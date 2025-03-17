@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report_title }}</title>
+
+    <!-- Bootstrap CSS (from CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --light-text: #f8f9fa;
+            --dark-text: #212529;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+        }
+
+        .dark-mode .card,
+        .dark-mode .accordion-item {
+            background-color: #2d3748;
+            color: var(--light-text);
+            border-color: #4a5568;
+        }
+
+        .dark-mode .table {
+            color: var(--light-text);
+        }
+
+        .dark-mode .table thead th {
+            background-color: #4a5568;
+            color: var(--light-text);
+        }
+
+        .dark-mode .nav-tabs .nav-link.active {
+            background-color: #4a5568;
+            color: var(--light-text);
+            border-color: #4a5568;
+        }
+
+        .dark-mode .nav-tabs .nav-link {
+            color: #a0aec0;
+        }
+
+        .report-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .insight-card {
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .use-case-card {
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .impact-high {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .impact-medium {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .impact-low {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .toggle-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            background-color: yellow;
+            color: black;
+            padding: 2px;
+            border-radius: 3px;
+        }
+
+        .dark-mode .highlight {
+            background-color: #f39c12;
+            color: black;
+        }
+
+        /* Hide the collapsed content initially */
+        .collapse-content {
+            display: none;
+        }
+
+        /* Chart responsiveness */
+        .chart-img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Dark Mode Toggle -->
+    <div class="toggle-container">
+        <button id="darkModeToggle" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-moon"></i> Dark Mode
+        </button>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="btn btn-primary back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <header class="report-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <h1>{{ report_title }}</h1>
+                    <p>Generated on {{ generation_time }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <p><strong>AI-Powered Analytics</strong></p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mb-5">
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search the report...">
+                <button class="btn btn-outline-secondary" type="button" id="clearSearch">Clear</button>
+                <div class="input-group-text" id="searchResults">0 results</div>
+            </div>
+        </div>
+
+        <!-- Data Summary Section -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center" role="button"
+                data-bs-toggle="collapse" data-bs-target="#dataSummaryCollapse">
+                <h2 class="mb-0"><i class="fas fa-chart-pie me-2"></i> Data Summary</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="collapse show" id="dataSummaryCollapse">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th>Total Records</th>
+                                        <td>{{ data_summary.total_records }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Columns</th>
+                                        <td>{{ data_summary.total_columns }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Numerical Columns</th>
+                                        <td>{{ data_summary.numerical_columns }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Categorical Columns</th>
+                                        <td>{{ data_summary.categorical_columns }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th>Missing Values</th>
+                                        <td>{{ data_summary.missing_values }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Missing Percentage</th>
+                                        <td>{{ data_summary.missing_percentage }}%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visualizations Section with Tabs -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center" role="button"
+                data-bs-toggle="collapse" data-bs-target="#visualizationsCollapse">
+                <h2 class="mb-0"><i class="fas fa-chart-bar me-2"></i> Data Visualizations</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="collapse show" id="visualizationsCollapse">
+                <div class="card-body">
+                    <!-- Tabs for different visualizations -->
+                    <ul class="nav nav-tabs" id="vizTabs" role="tablist">
+                        {% if 'distributions' in chart_paths %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="distributions-tab" data-bs-toggle="tab"
+                                data-bs-target="#distributions" type="button" role="tab">Distributions</button>
+                        </li>
+                        {% endif %}
+
+                        {% if 'boxplots' in chart_paths %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {% if 'distributions' not in chart_paths %}active{% endif %}"
+                                id="boxplots-tab" data-bs-toggle="tab" data-bs-target="#boxplots" type="button"
+                                role="tab">Box Plots</button>
+                        </li>
+                        {% endif %}
+
+                        {% if 'correlation' in chart_paths %}
+                        <li class="nav-item" role="presentation">
+                            <button
+                                class="nav-link {% if 'distributions' not in chart_paths and 'boxplots' not in chart_paths %}active{% endif %}"
+                                id="correlation-tab" data-bs-toggle="tab" data-bs-target="#correlation" type="button"
+                                role="tab">Correlation</button>
+                        </li>
+                        {% endif %}
+
+                        {% if 'categorical' in chart_paths %}
+                        <li class="nav-item" role="presentation">
+                            <button
+                                class="nav-link {% if 'distributions' not in chart_paths and 'boxplots' not in chart_paths and 'correlation' not in chart_paths %}active{% endif %}"
+                                id="categorical-tab" data-bs-toggle="tab" data-bs-target="#categorical" type="button"
+                                role="tab">Categorical</button>
+                        </li>
+                        {% endif %}
+                    </ul>
+
+                    <!-- Tab content -->
+                    <div class="tab-content mt-3" id="vizTabContent">
+                        {% if 'distributions' in chart_paths %}
+                        <div class="tab-pane fade show active" id="distributions" role="tabpanel">
+                            <div class="chart-container">
+                                <img src="{{ chart_paths.distributions }}" alt="Distributions" class="chart-img">
+                                <p class="mt-2">Distribution of numerical variables showing frequency patterns.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if 'boxplots' in chart_paths %}
+                        <div class="tab-pane fade {% if 'distributions' not in chart_paths %}show active{% endif %}"
+                            id="boxplots" role="tabpanel">
+                            <div class="chart-container">
+                                <img src="{{ chart_paths.boxplots }}" alt="Box Plots" class="chart-img">
+                                <p class="mt-2">Box plots showing the distribution of values, quartiles, and potential
+                                    outliers.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if 'correlation' in chart_paths %}
+                        <div class="tab-pane fade {% if 'distributions' not in chart_paths and 'boxplots' not in chart_paths %}show active{% endif %}"
+                            id="correlation" role="tabpanel">
+                            <div class="chart-container">
+                                <img src="{{ chart_paths.correlation }}" alt="Correlation Heatmap" class="chart-img">
+                                <p class="mt-2">Correlation heatmap showing relationships between numerical variables.
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if 'categorical' in chart_paths %}
+                        <div class="tab-pane fade {% if 'distributions' not in chart_paths and 'boxplots' not in chart_paths and 'correlation' not in chart_paths %}show active{% endif %}"
+                            id="categorical" role="tabpanel">
+                            <div class="chart-container">
+                                <img src="{{ chart_paths.categorical }}" alt="Categorical Analysis" class="chart-img">
+                                <p class="mt-2">Analysis of categorical variables showing counts and relationships.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Insights Section -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center" role="button"
+                data-bs-toggle="collapse" data-bs-target="#insightsCollapse">
+                <h2 class="mb-0"><i class="fas fa-lightbulb me-2"></i> Key Insights</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="collapse show" id="insightsCollapse">
+                <div class="card-body">
+                    <div class="accordion" id="insightsAccordion">
+                        {% for insight_type, insight_text in insights.items() %}
+                        <div class="accordion-item insight-card">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#insight{{ loop.index }}">
+                                    {{ insight_type|capitalize }} Insights
+                                </button>
+                            </h2>
+                            <div id="insight{{ loop.index }}" class="accordion-collapse collapse show"
+                                data-bs-parent="#insightsAccordion">
+                                <div class="accordion-body">
+                                    <pre>{{ insight_text }}</pre>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Use Cases Section -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center" role="button"
+                data-bs-toggle="collapse" data-bs-target="#useCasesCollapse">
+                <h2 class="mb-0"><i class="fas fa-tasks me-2"></i> Recommended Use Cases</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="collapse show" id="useCasesCollapse">
+                <div class="card-body">
+                    <div class="row">
+                        {% for use_case in use_cases %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card use-case-card h-100">
+                                <div class="card-header">
+                                    <h3 class="mb-0">{{ use_case.title }}</h3>
+                                </div>
+                                <div class="card-body">
+                                    <p>{{ use_case.description }}</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span>
+                                            <strong>Impact:</strong>
+                                            <span class="impact-{{ use_case.impact|lower }}">
+                                                {{ use_case.impact }}
+                                            </span>
+                                        </span>
+                                        <span><strong>Effort:</strong> {{ use_case.effort }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column Details Section -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center" role="button"
+                data-bs-toggle="collapse" data-bs-target="#columnDetailsCollapse">
+                <h2 class="mb-0"><i class="fas fa-table me-2"></i> Column Details</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="collapse" id="columnDetailsCollapse">
+                <div class="card-body">
+                    <div class="accordion" id="columnAccordion">
+                        {% for column, stats in column_stats.items() %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#column{{ loop.index }}">
+                                    {{ column }} ({{ stats.type }})
+                                </button>
+                            </h2>
+                            <div id="column{{ loop.index }}" class="accordion-collapse collapse"
+                                data-bs-parent="#columnAccordion">
+                                <div class="accordion-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            <tr>
+                                                <th>Missing Values</th>
+                                                <td>{{ stats.missing_count }} ({{ stats.missing_percentage }}%)</td>
+                                            </tr>
+
+                                            {% if 'min' in stats %}
+                                            <tr>
+                                                <th>Minimum</th>
+                                                <td>{{ stats.min }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Maximum</th>
+                                                <td>{{ stats.max }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Mean</th>
+                                                <td>{{ stats.mean }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Median</th>
+                                                <td>{{ stats.median }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Standard Deviation</th>
+                                                <td>{{ stats.std }}</td>
+                                            </tr>
+                                            {% endif %}
+
+                                            {% if 'unique_values' in stats %}
+                                            <tr>
+                                                <th>Unique Values</th>
+                                                <td>{{ stats.unique_values }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Top Values</th>
+                                                <td>
+                                                    <ul class="list-unstyled">
+                                                        {% for value, count in stats.top_values.items() %}
+                                                        <li><strong>{{ value }}</strong>: {{ count }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-5 pt-4 border-top">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p>Generated by AI Data Analysis Automation Platform</p>
+                    <p><small>This report is generated automatically and should be reviewed by a data
+                            professional.</small></p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper (from CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript for interactive features -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Dark Mode Toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+
+            // Check for saved dark mode preference
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                body.classList.add('dark-mode');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            }
+
+            darkModeToggle.addEventListener('click', function () {
+                body.classList.toggle('dark-mode');
+
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('darkMode', 'enabled');
+                    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+                } else {
+                    localStorage.setItem('darkMode', 'disabled');
+                    darkModeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+                }
+            });
+
+            // Search Functionality
+            const searchInput = document.getElementById('searchInput');
+            const clearSearchBtn = document.getElementById('clearSearch');
+            const searchResultsDisplay = document.getElementById('searchResults');
+
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                if (searchTerm.length < 2) {
+                    clearSearch();
+                    return;
+                }
+
+                // Remove previous highlights
+                document.querySelectorAll('.highlight').forEach(el => {
+                    const parent = el.parentNode;
+                    parent.replaceChild(document.createTextNode(el.textContent), el);
+                    parent.normalize();
+                });
+
+                // Text nodes to search (excluding script and style tags)
+                const textNodes = [];
+                const walk = document.createTreeWalker(
+                    document.body,
+                    NodeFilter.SHOW_TEXT,
+                    {
+                        acceptNode: function (node) {
+                            const parent = node.parentNode;
+                            if (parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE') {
+                                return NodeFilter.FILTER_REJECT;
+                            }
+                            return NodeFilter.FILTER_ACCEPT;
+                        }
+                    },
+                    false
+                );
+
+                let node;
+                while (node = walk.nextNode()) {
+                    textNodes.push(node);
+                }
+
+                // Highlight matches
+                let count = 0;
+                textNodes.forEach(textNode => {
+                    const content = textNode.textContent;
+                    const contentLower = content.toLowerCase();
+                    let index = contentLower.indexOf(searchTerm);
+
+                    if (index >= 0) {
+                        // Create container for highlights
+                        const container = document.createDocumentFragment();
+                        let lastIndex = 0;
+
+                        while (index >= 0) {
+                            // Add text before the match
+                            container.appendChild(document.createTextNode(content.substring(lastIndex, index)));
+
+                            // Create highlighted span for the match
+                            const highlight = document.createElement('span');
+                            highlight.className = 'highlight';
+                            highlight.textContent = content.substring(index, index + searchTerm.length);
+                            container.appendChild(highlight);
+
+                            // Update counters
+                            lastIndex = index + searchTerm.length;
+                            index = contentLower.indexOf(searchTerm, lastIndex);
+                            count++;
+
+                            // If this is the last match, add remaining text
+                            if (index < 0) {
+                                container.appendChild(document.createTextNode(content.substring(lastIndex)));
+                            }
+                        }
+
+                        // Replace the original text node with our highlighted version
+                        textNode.parentNode.replaceChild(container, textNode);
+                    }
+                });
+
+                // Update results count
+                searchResultsDisplay.textContent = `${count} results`;
+
+                // If there are matches, scroll to the first one
+                if (count > 0) {
+                    const firstHighlight = document.querySelector('.highlight');
+                    if (firstHighlight) {
+                        firstHighlight.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                }
+            }
+
+            function clearSearch() {
+                searchInput.value = '';
+                searchResultsDisplay.textContent = '0 results';
+
+                // Remove all highlights
+                document.querySelectorAll('.highlight').forEach(el => {
+                    const parent = el.parentNode;
+                    parent.replaceChild(document.createTextNode(el.textContent), el);
+                    parent.normalize();
+                });
+            }
+
+            searchInput.addEventListener('keyup', function (e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                } else if (e.key === 'Escape') {
+                    clearSearch();
+                } else if (searchInput.value.length >= 3) {
+                    performSearch();
+                } else if (searchInput.value.length === 0) {
+                    clearSearch();
+                }
+            });
+
+            clearSearchBtn.addEventListener('click', clearSearch);
+
+            // Back to Top Button
+            const backToTopBtn = document.getElementById('backToTop');
+
+            window.addEventListener('scroll', function () {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.style.display = 'block';
+                } else {
+                    backToTopBtn.style.display = 'none';
+                }
+            });
+
+            backToTopBtn.addEventListener('click', function () {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+id,name,age,salary,department,hire_date,performance_score,education,location
+1,John Smith,35,75000,Engineering,2018-05-12,4.2,Masters,New York
+2,Jane Doe,28,82000,Marketing,2019-03-24,4.5,Bachelors,San Francisco
+3,Mike Johnson,42,95000,Engineering,2015-11-01,3.8,PhD,Chicago
+4,Sarah Williams,31,,HR,2020-01-15,4.0,Bachelors,Boston
+5,Robert Brown,39,110000,Finance,2017-08-30,4.7,Masters,New York
+6,,45,120000,Management,2016-04-22,4.8,MBA,San Francisco
+7,Emily Davis,29,78000,Marketing,2021-06-10,3.5,Bachelors,Chicago
+8,David Wilson,33,88000,Engineering,2019-09-05,4.1,Masters,Seattle
+9,Lisa Anderson,37,,Finance,2018-12-18,4.3,MBA,Boston
+10,Mark Taylor,41,115000,Management,2017-02-28,4.6,PhD,New York
+11,Jennifer Martinez,32,79000,HR,2020-07-15,3.9,Bachelors,Chicago
+12,Michael Williams,38,92000,Engineering,2016-10-20,4.2,Masters,Seattle
+13,Jessica Brown,27,76000,Marketing,2021-01-05,3.7,Bachelors,San Francisco
+14,Christopher Lee,44,130000,Finance,2015-03-18,4.9,PhD,New York
+15,Amanda Johnson,31,83000,Engineering,2019-11-30,4.0,Masters,Chicago 

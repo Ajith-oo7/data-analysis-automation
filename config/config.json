@@ -1,0 +1,100 @@
+{
+    "data_ingestion": {
+        "source_dir": "source_data",
+        "supported_file_types": [
+            ".csv",
+            ".xls",
+            ".xlsx",
+            ".json",
+            ".parquet"
+        ],
+        "watch_directory": false,
+        "watch_interval": 30
+    },
+    "data_processing": {
+        "output_dir": "processed_data",
+        "perform_data_cleaning": true,
+        "handle_missing_values": "mean",
+        "remove_duplicates": true,
+        "clip_outliers": true,
+        "transformations": {
+            "salary": "normalize",
+            "age": "scale",
+            "name": "clean"
+        }
+    },
+    "ai_insights": {
+        "output_dir": "insights",
+        "use_snowflake": false,
+        "models": {
+            "default": "gpt-3.5-turbo",
+            "enhanced": "gpt-4"
+        },
+        "insight_types": [
+            "general",
+            "department",
+            "salary",
+            "performance"
+        ]
+    },
+    "reporting": {
+        "output_dir": "reports",
+        "generate_pdf": false,
+        "chart_theme": "default",
+        "color_palette": [
+            "#3498db",
+            "#2ecc71",
+            "#e74c3c",
+            "#f39c12",
+            "#9b59b6"
+        ],
+        "include_data_summary": true,
+        "include_charts": true,
+        "max_insights_per_category": 5,
+        "email": {
+            "enabled": false,
+            "smtp_server": "smtp.example.com",
+            "smtp_port": 587,
+            "username": "",
+            "password": "",
+            "sender": "reports@example.com",
+            "recipients": [],
+            "use_tls": true,
+            "use_ssl": false,
+            "send_on_completion": true
+        }
+    },
+    "forecasting": {
+        "output_dir": "forecasts",
+        "default_model": "arima",
+        "confidence_interval": 0.95,
+        "forecast_periods": 30,
+        "models": {
+            "arima": {
+                "max_order": [
+                    5,
+                    2,
+                    5
+                ]
+            },
+            "sma": {
+                "window_size": 0.3
+            }
+        },
+        "visualization": {
+            "include_confidence_intervals": true,
+            "chart_style": "seaborn"
+        }
+    },
+    "automation": {
+        "api": {
+            "enabled": true,
+            "host": "0.0.0.0",
+            "port": 8000
+        },
+        "scheduling": {
+            "enabled": true,
+            "cron_expression": "0 0 * * *"
+        }
+    }
+}

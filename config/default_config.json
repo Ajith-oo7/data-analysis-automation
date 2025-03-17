@@ -1,0 +1,63 @@
+{
+    "data_ingestion": {
+        "source_dir": "source_data",
+        "supported_file_types": [
+            ".csv",
+            ".xls",
+            ".xlsx",
+            ".json"
+        ],
+        "watch_for_new_files": true,
+        "polling_interval": 5,
+        "required_columns": []
+    },
+    "data_processing": {
+        "output_dir": "processed_data",
+        "perform_data_cleaning": true,
+        "handle_missing_values": "mean",
+        "remove_duplicates": true
+    },
+    "ai_insights": {
+        "snowflake": {
+            "account": "YOUR_ACCOUNT",
+            "user": "YOUR_USER",
+            "password": "YOUR_PASSWORD",
+            "warehouse": "YOUR_WAREHOUSE",
+            "database": "YOUR_DATABASE",
+            "schema": "YOUR_SCHEMA"
+        },
+        "models": {
+            "default": "gpt-3.5-turbo",
+            "enhanced": "gpt-4"
+        }
+    },
+    "reporting": {
+        "output_dir": "reports",
+        "formats": [
+            "html",
+            "pdf",
+            "excel"
+        ],
+        "tableau": {
+            "server": "YOUR_TABLEAU_SERVER",
+            "username": "YOUR_TABLEAU_USERNAME",
+            "password": "YOUR_TABLEAU_PASSWORD",
+            "site": "YOUR_TABLEAU_SITE"
+        },
+        "powerbi": {
+            "workspace_id": "YOUR_WORKSPACE_ID",
+            "report_id": "YOUR_REPORT_ID"
+        }
+    },
+    "automation": {
+        "schedule": {
+            "enabled": false,
+            "cron_expression": "0 0 * * *"
+        },
+        "api": {
+            "enabled": true,
+            "host": "0.0.0.0",
+            "port": 8000
+        }
+    }
+}
